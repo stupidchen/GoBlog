@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	_ "./model"
 )
 
-func handler(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "Hello world, %s!", request.URL.Path[1:])
-}
-
 func main() {
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
+	server := http.Server{
+		Addr: "127.0.0.1:8080",
+		Handler: nil,
+	}
+
+	server.ListenAndServe()
 }
