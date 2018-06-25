@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	_ "app/model"
+	_ "blog/model"
 )
 
 func main() {
