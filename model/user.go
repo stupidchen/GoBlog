@@ -1,7 +1,6 @@
 package model
 
 import (
-	"strings"
 	"net/http"
 	"fmt"
 )
@@ -13,16 +12,6 @@ type user struct {
 	password string
 	info string
 }
-
-func getSubPath(path string, index int) *string {
-	t := strings.Split(path, "/")
-	if len(t) < index {
-		return nil
-	} else {
-		return &t[index]
-	}
-}
-
 
 type UserHandler struct {
 }

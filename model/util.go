@@ -3,6 +3,7 @@ package model
 import (
 	"net/http"
 	"fmt"
+	"strings"
 )
 
 type JsonHandler interface {
@@ -21,6 +22,15 @@ func getRequestBody(r *http.Request) *string {
 	}
 	s := string(buf)
 	return &s
+}
+
+func getSubPath(path string, index int) *string {
+	t := strings.Split(path, "/")
+	if len(t) < index {
+		return nil
+	} else {
+		return &t[index]
+	}
 }
 
 func JsonWrapper(h JsonHandler) http.HandlerFunc {
