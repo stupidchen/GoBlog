@@ -3,14 +3,19 @@ package model
 import (
 	"net/http"
 	"fmt"
+	"github.com/jinzhu/gorm"
 )
 
-type user struct {
-	id string
+type User struct {
+	gorm.Model
 	username string
 	email string
 	password string
 	info string
+}
+
+type Users struct {
+	data []User
 }
 
 type UserHandler struct {
@@ -21,7 +26,7 @@ func (h *UserHandler) Get(r *http.Request) *Model {
 	if username == nil {
 		return InitError("User name is missing!")
 	}
-	return InitHint(fmt.Sprintf("Getting user %s", *username))
+	return InitHint(fmt.Sprintf("Getting User %s", *username))
 }
 
 func (h *UserHandler) Post(r *http.Request, body *Model) *Model {
@@ -37,5 +42,5 @@ func (h *UserHandler) Delete(r *http.Request) *Model {
 }
 
 func init() {
-	http.HandleFunc("/user/", JsonWrapper(&UserHandler{}))
+	http.HandleFunc("/User/", JsonWrapper(&UserHandler{}))
 }

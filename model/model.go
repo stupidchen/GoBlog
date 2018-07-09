@@ -2,17 +2,21 @@ package model
 
 import (
 	"fmt"
+	"blog/db"
 )
 
 type Model struct {
-	archive
-	comment
-	user
+	Archives
+	Comments
+	Users
 	ok        bool
 	modelType string
 	message   string
 }
 
+func init() {
+	db.Db.AutoMigrate(&Archive{}, &Comment{}, &User{})
+}
 
 func (m *Model) ToString() string {
 	return fmt.Sprintf("Model (Type: %s, Content: %s)", m.modelType, m.message)

@@ -1,12 +1,19 @@
 package model
 
-import "net/http"
+import (
+	"net/http"
+	"github.com/jinzhu/gorm"
+)
 
-type comment struct {
-	id string
+type Comment struct {
+	gorm.Model
 	author string
 	pubTime string
 	content string
+}
+
+type Comments struct {
+	data []Comment
 }
 
 type CommentHandler struct {
@@ -29,5 +36,5 @@ func (h *CommentHandler) Delete (r *http.Request) *Model {
 }
 
 func init() {
-	http.HandleFunc("/comment/", JsonWrapper(&CommentHandler{}))
+	http.HandleFunc("/Comment/", JsonWrapper(&CommentHandler{}))
 }
