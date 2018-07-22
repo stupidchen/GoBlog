@@ -4,7 +4,16 @@ import (
 	"net/http"
 	"fmt"
 	"strings"
+	"log"
+	"os"
+	"strconv"
 )
+
+type Global struct {
+	logger *log.Logger
+}
+
+var GLOBAL *Global
 
 type JsonHandler interface {
 	Get(r *http.Request) *Model
@@ -35,12 +44,20 @@ func getSubPath(path string, index int) *string {
 
 func JsonWrapper(h JsonHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		logger := GLOBAL.logger
 		var m *Model
 		if r.Method == "POST" || r.Method == "PUT" {
 			m = FromString(getRequestBody(r))
-			fmt.Fprint(w, "Cannot read request from client")
+			fmt.Fprint(w, "")
+			logger.Panicln("Cannot read request from client")
+			return
 		}
 
+		if m != nil {
+			logger.Printf("Request %s:%s with body %s is accepted.", r.Method, r.URL, *m)
+		} else {
+			logger.Printf("Request %s:%s is accepted.", r.Method, r.URL)
+		}
 		var tm *Model
 		switch r.Method {
 		case "GET": tm = h.Get(r)
@@ -50,6 +67,22 @@ func JsonWrapper(h JsonHandler) http.HandlerFunc {
 		default:
 			tm = InitError("Unsupported HTTP method")
 		}
+		logger.Printf("Request %s:%s is processed. Return status is %s, message is %s",
+			r.Method, r.URL, strconv.FormatBool(tm.ok), tm.message)
 		fmt.Fprint(w, tm.ToString())
 	}
+}
+
+func init() {
+	logFile, err := os.Create("/var/log/blog.log")
+	var logger *log.Logger
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("Cannot create the log file. Use stdout.")
+		logger = log.New(os.Stdout, "", log.LstdFlags | log.Lshortfile)
+	} else {
+		logger = log.New(logFile, "", log.LstdFlags | log.Lshortfile)
+	}
+
+	GLOBAL = &Global{logger:logger}
 }

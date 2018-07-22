@@ -23,7 +23,7 @@ type ArticleHandler struct {
 
 func (h *ArticleHandler) Get (r *http.Request) *Model {
 	s2 := getSubPath(r.URL.Path, 2)
-	if s2 != nil {
+	if s2 != nil && len(*s2) != 0 {
 		id, err := strconv.ParseInt(*s2, 10, 64)
 		if err != nil {
 			return InitError(err.Error())
