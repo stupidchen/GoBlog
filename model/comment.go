@@ -7,8 +7,8 @@ import (
 
 type Comment struct {
 	gorm.Model
-	Author string
-	Content string
+	Author string `gorm:"not null"`
+	Content string `gorm:"type:text"`
 }
 
 type Comments struct {

@@ -6,7 +6,7 @@ import (
 )
 
 type Model struct {
-	Archives
+	Articles
 	Comments
 	Users
 	ok        bool
@@ -15,7 +15,7 @@ type Model struct {
 }
 
 func init() {
-	db.Db.AutoMigrate(&Archive{}, &Comment{}, &User{})
+	db.Db.AutoMigrate(&Article{}, &Comment{}, &User{})
 }
 
 func (m *Model) ToString() string {
