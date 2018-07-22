@@ -7,9 +7,8 @@ import (
 
 type Comment struct {
 	gorm.Model
-	author string
-	pubTime string
-	content string
+	Author string
+	Content string
 }
 
 type Comments struct {

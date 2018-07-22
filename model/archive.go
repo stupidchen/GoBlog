@@ -9,11 +9,9 @@ import (
 
 type Archive struct {
 	gorm.Model
-	title string
-	content string
-	author string
-	pubTime string
-	editTime string
+	Title string
+	Content string
+	Author string
 }
 
 type Archives struct {
