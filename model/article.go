@@ -1,67 +1,52 @@
 package model
 
 import (
-	"net/http"
-	"blog/db"
 	"github.com/jinzhu/gorm"
-	"strconv"
+	"blog/global"
+	"time"
 )
 
 type Article struct {
+	Object
 	gorm.Model
 	Title string `gorm:"not null"`
 	Content string `gorm:"type:text"`
 	Author string `gorm:"not null"`
 }
 
-type Articles struct {
-	data []Article
-}
-
-type ArticleHandler struct {
-}
-
-func (h *ArticleHandler) Get (r *http.Request) *Model {
-	s2 := getSubPath(r.URL.Path, 2)
-	if s2 != nil && len(*s2) != 0 {
-		id, err := strconv.ParseInt(*s2, 10, 64)
-		if err != nil {
-			return InitError(err.Error())
-		}
-		var article Article
-		db.Db.Find(&article, id)
-		return &Model{
-			Articles: Articles{
-				data: []Article{article},
-			},
-			ok: true,
-			modelType: "Articles",
-		}
-
-	} else {
-		var a Articles
-		db.Db.Find(&a.data)
-		return &Model{
-			Articles:  a,
-			ok:        true,
-			modelType: "Articles",
-		}
+func FindArticleById(id uint) *Article {
+	db := global.GLOBAL.DB
+	var a Article
+	if db.Find(&a, id).RecordNotFound() {
+		return nil
 	}
-	return nil
+	return &a
 }
 
-func (h *ArticleHandler) Post (r *http.Request, body *Model) *Model {
-	return nil
+func GetAllArticles() *[]Article {
+	var a []Article
+	db := global.GLOBAL.DB
+	db.Find(&a)
+	return &a
 }
 
-func (h *ArticleHandler) Put (r *http.Request, body *Model) *Model {
-	return nil
+func AddArticle(article Article) error {
+	db := global.GLOBAL.DB
+	return db.Create(&article).Error
 }
 
-func (h *ArticleHandler) Delete (r *http.Request) *Model {
-	return nil
+func UpdateArticle(article Article) error {
+	db := global.GLOBAL.DB
+	return db.Save(&article).Error
 }
 
-func init() {
-	http.HandleFunc("/Article/", JsonWrapper(&ArticleHandler{}))
+func DeleteArticle(id uint) error {
+	db := global.GLOBAL.DB
+	a := Article{Model: gorm.Model{
+		ID:        id,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
+		DeletedAt: nil,
+	}}
+	return db.Delete(&a).Error
 }
