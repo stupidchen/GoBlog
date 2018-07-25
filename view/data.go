@@ -13,10 +13,10 @@ type RequestData struct {
 }
 
 type ResponseData struct {
-	Ok        bool
-	ModelType string
-	Message   string
-	Object    model.Object
+	Ok        bool		   `json:"ok"`
+	ModelType string	   `json:"modelType"`
+	Message   string	   `json:"message"`
+	Object    model.Object `json:"object,omitempty"`
 }
 
 func (m *ResponseData) ToString() string {

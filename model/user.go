@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	Object
+	Object `json:"object,omitempty"`
 	gorm.Model
 	Username string `gorm:"not null"`
 	Email string `gorm:"not null"`

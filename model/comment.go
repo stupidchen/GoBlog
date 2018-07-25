@@ -5,7 +5,7 @@ import (
 )
 
 type Comment struct {
-	Object
+	Object `json:"object,omitempty"`
 	gorm.Model
 	Author string `gorm:"not null"`
 	Content string `gorm:"type:text"`

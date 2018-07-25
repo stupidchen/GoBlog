@@ -49,16 +49,16 @@ func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData
 		body.Article.ID = uint(id)
 		err = model.AddArticle(body.Article)
 		if err != nil {
-			return InitError(fmt.Sprintf("Cannot update article %d due to %s.", id, err.Error()))
+			return InitError(fmt.Sprintf("Cannot create article %d due to %s.", id, err.Error()))
 		} else {
-			return InitHint(fmt.Sprintf("Article(id: %d) is updated.", body.Article.ID))
+			return InitHint(fmt.Sprintf("Article(id: %d) was created.", body.Article.ID))
 		}
 	} else {
 		err := model.AddArticle(body.Article)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot create article due to %s.", err.Error()))
 		} else {
-			return InitHint(fmt.Sprintf("Article(id: %d) is created.", body.Article.ID))
+			return InitHint(fmt.Sprintf("Article(id: %d) was created.", body.Article.ID))
 		}
 	}
 }
@@ -81,7 +81,7 @@ func (h *ArticleHandler) Put (r *http.Request, body *RequestData) *ResponseData 
 			return InitError(fmt.Sprintf("Cannot update article due to %s.", err.Error()))
 		}
 	}
-	return nil
+	return InitHint(fmt.Sprintf("Article(id: %d) was updated.", body.Article.ID))
 }
 
 func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {

@@ -7,7 +7,7 @@ import (
 )
 
 type Article struct {
-	Object
+	Object `json:"object,omitempty"`
 	gorm.Model
 	Title string `gorm:"not null"`
 	Content string `gorm:"type:text"`
@@ -37,7 +37,7 @@ func AddArticle(article Article) error {
 
 func UpdateArticle(article Article) error {
 	db := global.GLOBAL.DB
-	return db.Save(&article).Error
+	return db.Model(&article).Updates(article).Error
 }
 
 func DeleteArticle(id uint) error {
