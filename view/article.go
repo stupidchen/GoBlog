@@ -21,6 +21,16 @@ func (h *ArticleHandler) Get (r *http.Request) *ResponseData {
 		if a == nil {
 			return InitError(fmt.Sprintf("Article %d does not exist.", id))
 		}
+		s3 := getSubPath(r.URL.Path, 3)
+		if *s3 == "comment" {
+			c := model.FindCommentByArticleId(a.ID)
+			return &ResponseData{
+				Object: 	*c,
+				Ok:			true,
+				ModelType: 	"Comments",
+				Message:	"Get comments of article success.",
+			}
+		}
 		return &ResponseData{
 			Object:    *a,
 			Ok:        true,
