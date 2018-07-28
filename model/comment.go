@@ -9,7 +9,7 @@ import (
 type Comment struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
-	Article int `gorm:"not null"`
+	Article uint `gorm:"not null"`
 	Author string `gorm:"not null"`
 	Content string `gorm:"type:text"`
 }
@@ -30,14 +30,14 @@ func FindCommentByArticleId(articleId uint) *[]Comment {
 	return &comments
 }
 
-func AddComment(comment Comment) error {
+func AddComment(comment *Comment) error {
 	db := global.GLOBAL.DB
-	return db.Create(&comment).Error
+	return db.Create(comment).Error
 }
 
-func UpdateComment(comment Comment) error {
+func UpdateComment(comment *Comment) error {
 	db := global.GLOBAL.DB
-	return db.Model(&comment).Updates(comment).Error
+	return db.Model(comment).Updates(*comment).Error
 }
 
 func DeleteComment(id uint) error {

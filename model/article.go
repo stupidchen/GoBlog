@@ -12,6 +12,7 @@ type Article struct {
 	Title string `gorm:"not null"`
 	Content string `gorm:"type:text"`
 	Author string `gorm:"not null"`
+	Comments []Comment `gorm:"foreignkey:ID"`
 }
 
 func FindArticleById(id uint) *Article {
@@ -30,14 +31,14 @@ func GetAllArticles() *[]Article {
 	return &a
 }
 
-func AddArticle(article Article) error {
+func AddArticle(article *Article) error {
 	db := global.GLOBAL.DB
-	return db.Create(&article).Error
+	return db.Create(article).Error
 }
 
-func UpdateArticle(article Article) error {
+func UpdateArticle(article *Article) error {
 	db := global.GLOBAL.DB
-	return db.Model(&article).Updates(article).Error
+	return db.Model(article).Updates(*article).Error
 }
 
 func DeleteArticle(id uint) error {

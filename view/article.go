@@ -22,7 +22,7 @@ func (h *ArticleHandler) Get (r *http.Request) *ResponseData {
 			return InitError(fmt.Sprintf("Article %d does not exist.", id))
 		}
 		s3 := getSubPath(r.URL.Path, 3)
-		if *s3 == "comment" {
+		if s3 != nil && *s3 == "comment" {
 			c := model.FindCommentByArticleId(a.ID)
 			return &ResponseData{
 				Object: 	*c,
@@ -56,15 +56,25 @@ func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData
 		if err != nil {
 			return InitError(err.Error())
 		}
+		s3 := getSubPath(r.URL.Path, 3)
+		if s3 != nil && *s3 == "comment" {
+			body.Comment.Article = uint(id)
+			err = model.AddComment(&body.Comment)
+			if err != nil {
+				return InitError(fmt.Sprintf("Cannot create comment %d due to %s.", id, err.Error()))
+			} else {
+				return InitHint(fmt.Sprintf("Comment(id: %d) was created.", body.Comment.ID))
+			}
+		}
 		body.Article.ID = uint(id)
-		err = model.AddArticle(body.Article)
+		err = model.AddArticle(&body.Article)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot create article %d due to %s.", id, err.Error()))
 		} else {
 			return InitHint(fmt.Sprintf("Article(id: %d) was created.", body.Article.ID))
 		}
 	} else {
-		err := model.AddArticle(body.Article)
+		err := model.AddArticle(&body.Article)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot create article due to %s.", err.Error()))
 		} else {
@@ -81,17 +91,16 @@ func (h *ArticleHandler) Put (r *http.Request, body *RequestData) *ResponseData 
 			return InitError(err.Error())
 		}
 		body.Article.ID = uint(id)
-		err = model.UpdateArticle(body.Article)
+		a := model.FindArticleById(body.Article.ID)
+		if a == nil {
+			return InitError(fmt.Sprintf("Article %d does not exist.", id))
+		}
+		err = model.UpdateArticle(&body.Article)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot update article %d due to %s.", id, err.Error()))
 		}
-	} else {
-		err := model.UpdateArticle(body.Article)
-		if err != nil {
-			return InitError(fmt.Sprintf("Cannot update article due to %s.", err.Error()))
-		}
 	}
-	return InitHint(fmt.Sprintf("Article(id: %d) was updated.", body.Article.ID))
+	return InitError("Invalid parameter.")
 }
 
 func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {
@@ -106,11 +115,10 @@ func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {
 			return InitError(fmt.Sprintf("Cannot delete article(id: %d) due to %s.", id, err.Error()))
 		}
 		return InitHint(fmt.Sprintf("Article(id: %d) was deleted.", id))
-	} else {
-		return InitError("Invalid parameter.")
 	}
+	return InitError("Invalid parameter.")
 }
 
 func init() {
-	http.HandleFunc("/Article/", JsonWrapper(&ArticleHandler{}))
+	http.HandleFunc("/article/", JsonWrapper(&ArticleHandler{}))
 }

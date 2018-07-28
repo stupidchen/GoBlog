@@ -37,30 +37,14 @@ func (h *CommentHandler) Get (r *http.Request) *ResponseData {
 			Message:   "Get comments success.",
 		}
 	}
-	return nil
 }
 
 func (h *CommentHandler) Post (r *http.Request, body *RequestData) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
-	if s2 != nil && len(*s2) != 0 {
-		id, err := strconv.ParseInt(*s2, 10, 64)
-		if err != nil {
-			return InitError(err.Error())
-		}
-		body.Article.ID = uint(id)
-		err = model.AddComment(body.Comment)
-		if err != nil {
-			return InitError(fmt.Sprintf("Cannot create comment %d due to %s.", id, err.Error()))
-		} else {
-			return InitHint(fmt.Sprintf("Comment(id: %d) was created.", body.Comment.ID))
-		}
+	err := model.AddComment(&body.Comment)
+	if err != nil {
+		return InitError(fmt.Sprintf("Cannot create comment due to %s.", err.Error()))
 	} else {
-		err := model.AddComment(body.Comment)
-		if err != nil {
-			return InitError(fmt.Sprintf("Cannot create comment due to %s.", err.Error()))
-		} else {
-			return InitHint(fmt.Sprintf("Comment(id: %d) was created.", body.Comment.ID))
-		}
+		return InitHint(fmt.Sprintf("Comment(id: %d) was created.", body.Comment.ID))
 	}
 }
 
@@ -72,17 +56,16 @@ func (h *CommentHandler) Put (r *http.Request, body *RequestData) *ResponseData 
 			return InitError(err.Error())
 		}
 		body.Comment.ID = uint(id)
-		err = model.UpdateComment(body.Comment)
+		a := model.FindCommentById(body.Comment.ID)
+		if a == nil {
+			return InitError(fmt.Sprintf("Comment %d does not exist.", id))
+		}
+		err = model.UpdateComment(&body.Comment)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot update comment %d due to %s.", id, err.Error()))
 		}
-	} else {
-		err := model.UpdateComment(body.Comment)
-		if err != nil {
-			return InitError(fmt.Sprintf("Cannot update comment due to %s.", err.Error()))
-		}
 	}
-	return InitHint(fmt.Sprintf("Comment(id: %d) was updated.", body.Comment.ID))
+	return InitError("Invalid parameter.")
 }
 
 func (h *CommentHandler) Delete (r *http.Request) *ResponseData {
@@ -97,11 +80,10 @@ func (h *CommentHandler) Delete (r *http.Request) *ResponseData {
 			return InitError(fmt.Sprintf("Cannot delete comment(id: %d) due to %s.", id, err.Error()))
 		}
 		return InitHint(fmt.Sprintf("Comment(id: %d) was deleted.", id))
-	} else {
-		return InitError("Invalid parameter.")
 	}
+	return InitError("Invalid parameter.")
 }
 
 func init() {
-	http.HandleFunc("/Comment/", JsonWrapper(&CommentHandler{}))
+	http.HandleFunc("/comment/", JsonWrapper(&CommentHandler{}))
 }
