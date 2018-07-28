@@ -6,7 +6,6 @@ type Config struct {
 }
 
 type SystemConfig struct {
-	UnsecuredUrl []string
 	LogFile string
 }
 
@@ -19,7 +18,6 @@ type DatabaseConfig struct {
 
 func initConfig() *Config {
 	sys := SystemConfig{
-		UnsecuredUrl: []string {"/login", "/register"},
 		LogFile: "/var/log/goblog.log",
 	}
 	return &Config {

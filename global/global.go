@@ -12,6 +12,7 @@ type Global struct {
 	Logger *log.Logger
 	DB *gorm.DB
 	Config *Config
+	Token *map[string]uint
 }
 
 var GLOBAL *Global
@@ -25,9 +26,8 @@ func connectDatabase() *gorm.DB {
 }
 
 func init() {
-	GLOBAL = &Global{}
-	GLOBAL.Config = initConfig()
-	logFile, err := os.Create(GLOBAL.Config.Sys.LogFile)
+	config := initConfig()
+	logFile, err := os.Create(config.Sys.LogFile)
 	var logger *log.Logger
 	if err != nil {
 		fmt.Println(err)
@@ -37,6 +37,11 @@ func init() {
 		logger = log.New(logFile, "", log.LstdFlags | log.Lshortfile)
 	}
 	db := connectDatabase()
-	GLOBAL.Logger = logger
-	GLOBAL.DB = db
+	token := make(map[string]uint)
+	GLOBAL = &Global{
+		Config: config,
+		Logger: logger,
+		DB: db,
+		Token: &token,
+	}
 }

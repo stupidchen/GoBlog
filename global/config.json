@@ -1,0 +1,11 @@
+{
+  "db": {
+    "username": "root",
+    "password": "Kiminonawa?Taki",
+    "host": "120.55.56.82",
+    "port": "32779"
+  },
+  "system": {
+    "logFile": "/var/log/goblog.log"
+  }
+}

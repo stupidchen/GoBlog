@@ -3,7 +3,6 @@ package view
 import (
 	"net/http"
 	"fmt"
-	"strings"
 	"strconv"
 	"blog/global"
 )
@@ -16,25 +15,6 @@ type JsonHandler interface {
 	Delete(r *http.Request) *ResponseData
 }
 
-func getRequestBody(r *http.Request) *string {
-	l := r.ContentLength
-	buf := make([]byte, l)
-	rl, _ := r.Body.Read(buf)
-	if rl == 0 {
-		return nil
-	}
-	s := string(buf)
-	return &s
-}
-
-func getSubPath(path string, index int) *string {
-	t := strings.Split(path, "/")
-	if len(t) <= index {
-		return nil
-	} else {
-		return &t[index]
-	}
-}
 
 func SecurityWrapper(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
