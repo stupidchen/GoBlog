@@ -11,7 +11,7 @@ import (
 type Global struct {
 	Logger *log.Logger
 	DB *gorm.DB
-
+	Config *Config
 }
 
 var GLOBAL *Global
@@ -25,7 +25,8 @@ func connectDatabase() *gorm.DB {
 }
 
 func init() {
-	logFile, err := os.Create("/var/log/blog.log")
+	GLOBAL.Config = initConfig()
+	logFile, err := os.Create(GLOBAL.Config.Sys.Logfile)
 	var logger *log.Logger
 	if err != nil {
 		fmt.Println(err)

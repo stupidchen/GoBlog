@@ -36,6 +36,12 @@ func getSubPath(path string, index int) *string {
 	}
 }
 
+func SecurityWrapper(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
 func JsonWrapper(h JsonHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := global.GLOBAL.Logger
