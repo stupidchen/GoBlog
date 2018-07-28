@@ -25,8 +25,9 @@ func connectDatabase() *gorm.DB {
 }
 
 func init() {
+	GLOBAL = &Global{}
 	GLOBAL.Config = initConfig()
-	logFile, err := os.Create(GLOBAL.Config.Sys.Logfile)
+	logFile, err := os.Create(GLOBAL.Config.Sys.LogFile)
 	var logger *log.Logger
 	if err != nil {
 		fmt.Println(err)
@@ -35,8 +36,7 @@ func init() {
 	} else {
 		logger = log.New(logFile, "", log.LstdFlags | log.Lshortfile)
 	}
-
-	GLOBAL = &Global{Logger:logger}
 	db := connectDatabase()
+	GLOBAL.Logger = logger
 	GLOBAL.DB = db
 }

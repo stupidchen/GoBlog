@@ -29,5 +29,5 @@ func (h *UserHandler) Delete(r *http.Request) *ResponseData {
 }
 
 func init() {
-	http.HandleFunc("/user/", JsonWrapper(&UserHandler{}))
+	http.HandleFunc("/user/", SecurityWrapper(JsonWrapper(&UserHandler{})))
 }

@@ -38,7 +38,12 @@ func getSubPath(path string, index int) *string {
 
 func SecurityWrapper(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		if loginCheck(r) != nil {
+			h.ServeHTTP(w, r)
+		} else {
+			m := InitError("Unauthorized.")
+			fmt.Fprint(w, m.ToString())
+		}
 	}
 }
 

@@ -85,5 +85,5 @@ func (h *CommentHandler) Delete (r *http.Request) *ResponseData {
 }
 
 func init() {
-	http.HandleFunc("/comment/", JsonWrapper(&CommentHandler{}))
+	http.HandleFunc("/comment/", SecurityWrapper(JsonWrapper(&CommentHandler{})))
 }

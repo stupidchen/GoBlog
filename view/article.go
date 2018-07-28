@@ -120,5 +120,5 @@ func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {
 }
 
 func init() {
-	http.HandleFunc("/article/", JsonWrapper(&ArticleHandler{}))
+	http.HandleFunc("/article/", SecurityWrapper(JsonWrapper(&ArticleHandler{})))
 }
