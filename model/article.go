@@ -11,8 +11,8 @@ type Article struct {
 	gorm.Model
 	Title string `gorm:"not null"`
 	Content string `gorm:"type:text"`
-	Author string `gorm:"not null"`
-	Comments []Comment `gorm:"foreignkey:ID"`
+	Author uint `gorm:"not null"`
+	Comments []Comment `gorm:"foreignkey:Article"`
 }
 
 func FindArticleById(id uint) *Article {

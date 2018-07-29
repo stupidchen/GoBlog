@@ -22,17 +22,21 @@ type ResponseData struct {
 func (m *ResponseData) ToString() string {
 	b, err := json.Marshal(m)
 	if err != nil {
-		global.GLOBAL.Logger.Panicf("Cannot marshall the data due to %s.", err.Error())
-		return "Cannot format return data"
+		global.GLOBAL.Logger.Printf("Cannot marshall the data due to %s.", err.Error())
+		return "Cannot marshal return data"
 	}
 	return string(b)
 }
 
 func FromString(s *string) *RequestData {
 	var data RequestData
+	if len(*s) == 0 {
+		global.GLOBAL.Logger.Printf("Cannot unmarshall the empty request body")
+		return nil
+	}
 	err := json.Unmarshal([]byte(*s), &data)
 	if err != nil {
-		global.GLOBAL.Logger.Panicf("Cannot unmarshall the request body due to %s.", err.Error())
+		global.GLOBAL.Logger.Printf("Cannot unmarshall the request body due to %s.", err.Error())
 		return nil
 	}
 	return &data

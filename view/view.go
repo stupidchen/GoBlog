@@ -34,10 +34,15 @@ func JsonWrapper(h JsonHandler) http.HandlerFunc {
 		var body *string
 		if r.Method == "POST" || r.Method == "PUT" {
 			body = getRequestBody(r)
+			if body == nil {
+				fmt.Fprint(w, InitError("Cannot read request from client.").ToString())
+				logger.Printf("Cannot read request from client.")
+				return
+			}
 			m = FromString(body)
 			if m == nil {
-				fmt.Fprint(w, InitError("Cannot read request from client."))
-				logger.Panicln("Cannot read request from client.")
+				fmt.Fprint(w, InitError("Cannot marshal the request body.").ToString())
+				logger.Printf("Cannot marshal the request body %s.", *body)
 				return
 			}
 		}

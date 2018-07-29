@@ -8,7 +8,7 @@ import (
 type User struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
-	Username string `gorm:"not null"`
+	Username string `gorm:"not null;unique_index"`
 	Email string `gorm:"not null;unique_index"`
 	Password string `gorm:"not null"`
 	Info string `gorm:"type:text"`
@@ -26,7 +26,7 @@ func FindUserById(id uint) *User {
 func FindUser(user *User) *User {
 	db := global.GLOBAL.DB
 	var users []User
-	if db.Where(user).Find(&users).RecordNotFound() {
+	if db.Where(user).Find(&users).RecordNotFound() || len(users) == 0 {
 		return nil
 	}
 	return &users[0]

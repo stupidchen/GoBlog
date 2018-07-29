@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 	"math/rand"
 	"strconv"
+	"encoding/base64"
+	"crypto/sha1"
 )
 
 func getRequestBody(r *http.Request) *string {
@@ -55,9 +57,14 @@ func addToken(u uint) *string {
 		global.GLOBAL.Logger.Printf("Generate uuid error: %s. Use simple token.", err.Error())
 		token = strconv.FormatInt(rand.Int63(), 16)
 	} else {
-		token = string(tokenBytes[:])
+		token = base64.URLEncoding.EncodeToString(tokenBytes[:])
 	}
 	tokens := *global.GLOBAL.Token
 	tokens[token] = u
 	return &token
+}
+
+func generateBase64OfSha1(s string) string {
+	sha := sha1.Sum([]byte(s))
+	return base64.URLEncoding.EncodeToString(sha[:])
 }

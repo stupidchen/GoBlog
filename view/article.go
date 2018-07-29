@@ -11,7 +11,7 @@ type ArticleHandler struct {
 }
 
 func (h *ArticleHandler) Get (r *http.Request) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
+	s2 := getSubPath(r.URL.Path, 3)
 	if s2 != nil && len(*s2) != 0 {
 		id, err := strconv.ParseUint(*s2, 10, 64)
 		if err != nil {
@@ -21,7 +21,7 @@ func (h *ArticleHandler) Get (r *http.Request) *ResponseData {
 		if a == nil {
 			return InitError(fmt.Sprintf("Article %d does not exist.", id))
 		}
-		s3 := getSubPath(r.URL.Path, 3)
+		s3 := getSubPath(r.URL.Path, 4)
 		if s3 != nil && *s3 == "comment" {
 			c := model.FindCommentByArticleId(a.ID)
 			return &ResponseData{
@@ -50,7 +50,11 @@ func (h *ArticleHandler) Get (r *http.Request) *ResponseData {
 }
 
 func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
+	u := loginCheck(r)
+	if u == nil {
+		return InitError("You have not login.")
+	}
+	s2 := getSubPath(r.URL.Path, 3)
 	if s2 != nil && len(*s2) != 0 {
 		id, err := strconv.ParseInt(*s2, 10, 64)
 		if err != nil {
@@ -59,6 +63,7 @@ func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData
 		s3 := getSubPath(r.URL.Path, 3)
 		if s3 != nil && *s3 == "comment" {
 			body.Comment.Article = uint(id)
+			body.Comment.Author = *u
 			err = model.AddComment(&body.Comment)
 			if err != nil {
 				return InitError(fmt.Sprintf("Cannot create comment %d due to %s.", id, err.Error()))
@@ -66,14 +71,8 @@ func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData
 				return InitHint(fmt.Sprintf("Comment(id: %d) was created.", body.Comment.ID))
 			}
 		}
-		body.Article.ID = uint(id)
-		err = model.AddArticle(&body.Article)
-		if err != nil {
-			return InitError(fmt.Sprintf("Cannot create article %d due to %s.", id, err.Error()))
-		} else {
-			return InitHint(fmt.Sprintf("Article(id: %d) was created.", body.Article.ID))
-		}
 	} else {
+		body.Article.Author = *u
 		err := model.AddArticle(&body.Article)
 		if err != nil {
 			return InitError(fmt.Sprintf("Cannot create article due to %s.", err.Error()))
@@ -81,19 +80,26 @@ func (h *ArticleHandler) Post (r *http.Request, body *RequestData) *ResponseData
 			return InitHint(fmt.Sprintf("Article(id: %d) was created.", body.Article.ID))
 		}
 	}
+	return InitError("Invalid parameter.")
 }
 
 func (h *ArticleHandler) Put (r *http.Request, body *RequestData) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
+	u := loginCheck(r)
+	if u == nil {
+		return InitError("You have not login.")
+	}
+	s2 := getSubPath(r.URL.Path, 3)
 	if s2 != nil && len(*s2) != 0 {
 		id, err := strconv.ParseInt(*s2, 10, 64)
 		if err != nil {
 			return InitError(err.Error())
 		}
-		body.Article.ID = uint(id)
 		a := model.FindArticleById(body.Article.ID)
 		if a == nil {
 			return InitError(fmt.Sprintf("Article %d does not exist.", id))
+		}
+		if a.Author != *u {
+			return InitError("Unauthorized.")
 		}
 		err = model.UpdateArticle(&body.Article)
 		if err != nil {
@@ -104,11 +110,22 @@ func (h *ArticleHandler) Put (r *http.Request, body *RequestData) *ResponseData 
 }
 
 func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
+	u := loginCheck(r)
+	if u == nil {
+		return InitError("You have not login.")
+	}
+	s2 := getSubPath(r.URL.Path, 3)
 	if s2 != nil && len(*s2) != 0 {
 		id, err := strconv.ParseInt(*s2, 10, 64)
 		if err != nil {
 			return InitError(err.Error())
+		}
+		a := model.FindArticleById(uint(id))
+		if a == nil {
+			return InitError(fmt.Sprintf("Article %d does not exist.", id))
+		}
+		if a.Author != *u {
+			return InitError("Unauthorized.")
 		}
 		err = model.DeleteArticle(uint(id))
 		if err != nil {
@@ -120,5 +137,5 @@ func (h *ArticleHandler) Delete (r *http.Request) *ResponseData {
 }
 
 func init() {
-	http.HandleFunc("/article/", JsonWrapper(&ArticleHandler{}))
+	http.HandleFunc("/api/article/", JsonWrapper(&ArticleHandler{}))
 }

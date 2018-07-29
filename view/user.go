@@ -10,7 +10,7 @@ type UserHandler struct {
 }
 
 func (h *UserHandler) Get(r *http.Request) *ResponseData {
-	username := getSubPath(r.URL.Path, 2)
+	username := getSubPath(r.URL.Path, 3)
 	if username == nil {
 		return InitError("User name is missing!")
 	}
@@ -18,18 +18,22 @@ func (h *UserHandler) Get(r *http.Request) *ResponseData {
 }
 
 func (h *UserHandler) Post(r *http.Request, body *RequestData) *ResponseData {
-	s2 := getSubPath(r.URL.Path, 2)
+	s2 := getSubPath(r.URL.Path, 3)
 	if s2 != nil {
 		switch *s2 {
 		case "login":
 			if loginCheck(r) != nil {
 				return InitError("You have already login.")
 			}
-			u := model.FindUser(&body.User)
-			if u == nil {
+			u := model.User{
+				Username: body.User.Username,
+				Password: generateBase64OfSha1(body.User.Password),
+			}
+			tu := model.FindUser(&u)
+			if tu == nil {
 				return InitError("Invalid username or password.")
 			}
-			token := *addToken(body.User.ID)
+			token := *addToken(tu.ID)
 			return InitHint(fmt.Sprintf("User %s login success. Token is %s", body.User.Username, token))
 			break
 		case "logout":
@@ -41,6 +45,7 @@ func (h *UserHandler) Post(r *http.Request, body *RequestData) *ResponseData {
 			}
 			break
 		default:
+			body.User.Password = generateBase64OfSha1(body.User.Password)
 			err := model.AddUser(&body.User)
 			if err != nil {
 				return InitError(fmt.Sprintf("Create user failed due to %s", err.Error()))
@@ -61,5 +66,5 @@ func (h *UserHandler) Delete(r *http.Request) *ResponseData {
 }
 
 func init() {
-	http.HandleFunc("/user/", JsonWrapper(&UserHandler{}))
+	http.HandleFunc("/api/user/", JsonWrapper(&UserHandler{}))
 }

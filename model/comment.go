@@ -10,7 +10,7 @@ type Comment struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
 	Article uint `gorm:"not null"`
-	Author string `gorm:"not null"`
+	Author uint `gorm:"not null"`
 	Content string `gorm:"type:text"`
 }
 
