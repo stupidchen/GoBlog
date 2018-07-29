@@ -5,11 +5,17 @@ import (
 	_ "blog/view"
 )
 
-func main() {
+func initServer() {
+	fs := http.FileServer(http.Dir("static/"))
 	server := http.Server{
 		Addr: "0.0.0.0:8080",
 		Handler: nil,
 	}
 
+	http.Handle("/static/", http.StripPrefix("/static", fs))
 	server.ListenAndServe()
+}
+
+func main() {
+	initServer()
 }
