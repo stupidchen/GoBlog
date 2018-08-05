@@ -7,10 +7,25 @@
 </head>
 <body>
 <div id="app">
+    <el-menu :default-active="activeNavIndex" class="el-menu-demo" mode="horizontal"
+             background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" @select="handleMenuSelect">
+        <el-menu-item index="1">Articles</el-menu-item>
+        <el-submenu index="0">
+            <template slot="title">{{currentUser}}</template>
+            <el-menu-item index="0-1">Modify Information</el-menu-item>
+            <el-menu-item index="0-2">Logout</el-menu-item>
+        </el-submenu>
+    </el-menu>
+    <el-container>
+        <el-header>
+        </el-header>
+        <el-main>
+            <p>{{articles}}</p>
+        </el-main>
+    </el-container>
     <el-button @click="visible = true">Button</el-button>
     <el-dialog :visible.sync="visible" title="Hello world">
         <p>Try Element</p>
-        <p>{{articles}}</p>
     </el-dialog>
 </div>
 </body>
@@ -27,7 +42,9 @@
         data: function() {
             return {
                 visible: false,
-                articles: []
+                articles: [],
+                activeNavIndex: '1',
+                currentUser: 'Mike',
             }
         },
         created: function () {
@@ -40,7 +57,9 @@
             });
         },
         method: {
+            handleMenuSelect: function () {
 
+            }
         }
     })
 </script>
