@@ -18,7 +18,7 @@ type Global struct {
 var GLOBAL *Global
 
 func connectDatabase() *gorm.DB {
-	db, err := gorm.Open("mysql", "root:Kiminonawa?Taki@tcp(120.55.56.82:32779)/goblog?charset=utf8&&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:Kiminonawa?Taki@tcp(120.55.56.82:3306)/goblog?charset=utf8&&parseTime=True&loc=Local")
 	if err != nil {
 		GLOBAL.Logger.Fatalf("%s happened while connecting to database. Exit.", err.Error())
 	}

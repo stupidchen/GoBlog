@@ -8,10 +8,10 @@ import (
 type User struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
-	Username string `gorm:"not null;unique_index"`
-	Email string `gorm:"not null;unique_index"`
-	Password string `gorm:"not null"`
-	Info string `gorm:"type:text"`
+	Username string `json:"username",gorm:"not null;unique_index"`
+	Email string `json:"email",gorm:"not null;unique_index"`
+	Password string `json:"password",gorm:"not null"`
+	Info string `json:"info",gorm:"type:text"`
 }
 
 func FindUserById(id uint) *User {

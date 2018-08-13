@@ -9,10 +9,10 @@ import (
 type Article struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
-	Title string `gorm:"not null"`
-	Content string `gorm:"type:text"`
-	Author uint `gorm:"not null"`
-	Comments []Comment `gorm:"foreignkey:Article"`
+	Title string `json:"title",gorm:"not null"`
+	Content string `json:"content",gorm:"type:text"`
+	Author uint `json:"author",gorm:"not null"`
+	Comments []Comment `json:"comments",gorm:"foreignkey:Article"`
 }
 
 func FindArticleById(id uint) *Article {

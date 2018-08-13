@@ -9,9 +9,9 @@ import (
 type Comment struct {
 	Object `json:"object,omitempty"`
 	gorm.Model
-	Article uint `gorm:"not null"`
-	Author uint `gorm:"not null"`
-	Content string `gorm:"type:text"`
+	Article uint `json:"article",gorm:"not null"`
+	Author uint `json:"author",gorm:"not null"`
+	Content string `json:"content",gorm:"type:text"`
 }
 
 func FindCommentById(id uint) *Comment {
