@@ -1,5 +1,11 @@
 package global
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+)
+
 type Config struct {
 	Sys SystemConfig
 	Db DatabaseConfig
@@ -16,11 +22,58 @@ type DatabaseConfig struct {
 	Port string
 }
 
+func getConfigPath() string {
+	path := os.Getenv(ConfigPathEnvKey)
+	if path == "" {
+		return DefaultConfigFile
+	}
+	return ""
+}
+
+
+func initConfigByBytes(configBytes []byte) *Config {
+	var config Config
+
+	err := json.Unmarshal(configBytes, &config)
+	if err != nil {
+		return nil
+	}
+	return &config
+}
+
+
+func initConfigByEnvVar() *Config {
+	envConfigStr := os.Getenv(ConfigEnvKey)
+	if envConfigStr == "" {
+		return nil
+	}
+
+	return initConfigByBytes([]byte(envConfigStr))
+}
+
+func initConfigByFile() *Config {
+	path := getConfigPath()
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+
+	return initConfigByBytes(data)
+}
+
 func initConfig() *Config {
-	sys := SystemConfig{
-		LogFile: "/var/log/goblog.log",
+	var config *Config
+
+	config = initConfigByEnvVar()
+	if config != nil {
+		return config
 	}
-	return &Config {
-		Sys: sys,
+
+	config = initConfigByFile()
+	if config != nil {
+		return config
 	}
+
+	return nil
 }

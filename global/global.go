@@ -17,8 +17,9 @@ type Global struct {
 
 var GLOBAL *Global
 
-func connectDatabase() *gorm.DB {
-	db, err := gorm.Open("mysql", "root:Kiminonawa?Taki@tcp(120.55.56.82:3306)/goblog?charset=utf8&&parseTime=True&loc=Local")
+func connectDatabase(config DatabaseConfig) *gorm.DB {
+	connStr := fmt.Sprintf(DefaultDBConnectionFormat, config.Username, config.Password, config.Host, config.Port)
+	db, err := gorm.Open("mysql", connStr)
 	if err != nil {
 		GLOBAL.Logger.Fatalf("%s happened while connecting to database. Exit.", err.Error())
 	}
@@ -27,6 +28,10 @@ func connectDatabase() *gorm.DB {
 
 func init() {
 	config := initConfig()
+	if config == nil {
+		panic("Cannot init configuration by both file and environment variables. Exit.")
+	}
+
 	logFile, err := os.Create(config.Sys.LogFile)
 	var logger *log.Logger
 	if err != nil {
@@ -36,7 +41,8 @@ func init() {
 	} else {
 		logger = log.New(logFile, "", log.LstdFlags | log.Lshortfile)
 	}
-	db := connectDatabase()
+
+	db := connectDatabase(config.Db)
 	token := make(map[string]uint)
 	GLOBAL = &Global{
 		Config: config,
